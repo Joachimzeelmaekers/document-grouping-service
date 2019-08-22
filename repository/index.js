@@ -13,34 +13,35 @@ const getAllAgendaItemsFromAgendaWithDocuments = async (agendaId) => {
     PREFIX agenda: <http://data.lblod.info/id/agendas/>
     PREFIX mandaat: <http://data.vlaanderen.be/ns/mandaat#>
     PREFIX dct: <http://purl.org/dc/terms/>
-   
-    SELECT ?id (MAX(?versionNumber) as ?maxVersionNumber) ?documentVersionId ?fileId  WHERE { 
+    PREFIX dbpedia: <http://dbpedia.org/ontology/>
+    PREFIX nie: <http://www.semanticdesktop.org/ontologies/2007/01/19/nie#>
+    
+    SELECT (MAX(?versionNumber) as ?maxVersionNumber) ?documentVersionId ?numberVR ?extension ?download ?agendaitemPrio ?agendaitem_id ?documentVersionName  WHERE { 
        GRAPH <${targetGraph}>
        {
          ?agenda a besluitvorming:Agenda ;
                     mu:uuid "${agendaId}" .
          ?agenda   ext:agendaNaam ?agendaName .
          ?agenda   dct:hasPart ?agendaitem .
-         ?agendaitem mu:uuid ?id .
+         ?agendaitem mu:uuid ?agendaitem_id .
          OPTIONAL   { ?agendaitem ext:prioriteit ?agendaitemPrio . }
          OPTIONAL { 
 					 ?agendaitem ext:bevatAgendapuntDocumentversie ?documentVersions .
 					 ?document  besluitvorming:heeftVersie ?documentVersions .
+           OPTIONAL { ?document  besluitvorming:stuknummerVR ?numberVR . }
 					 ?documentVersions mu:uuid ?documentVersionId .
-					 ?documentVersions ext:versieNummer ?versionNumber .
-					 ?documentVersions ext:file ?file .
+           ?documentVersions ext:versieNummer ?versionNumber .
+          OPTIONAL { ?documentVersions ext:gekozenDocumentNaam ?documentVersionName }
+           ?documentVersions ext:file ?file .
+           ?download nie:dataSource ?file .
 					 ?file mu:uuid ?fileId .
+					 ?file dbpedia:fileExtension ?extension .
 				 }
         } 
-    } GROUP BY ?id ?documentVersionId ?fileId`;
+    } GROUP BY ?documentVersionId ?numberVR ?extension ?download ?agendaitemPrio ?agendaitem_id ?documentVersionName`;
   const data = await query(queryString);
   return parseSparqlResults(data);
 };
-
-//  ?subcase   besluitvorming:isGeagendeerdVia ?agendaitem .
-//  ?subcase   mu:uuid ?subcaseId .
-//  ?agendaitem ext:wordtGetoondAlsMededeling ?showAsRemark .
-//  FILTER(?showAsRemark ="false"^^<http://mu.semte.ch/vocabularies/typed-literals/boolean>)
 
 const parseSparqlResults = (data) => {
   if (!data) return;
