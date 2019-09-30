@@ -17,29 +17,28 @@ const getAllAgendaItemsFromAgendaWithDocuments = async (agendaId) => {
     PREFIX dbpedia: <http://dbpedia.org/ontology/>
     PREFIX nie: <http://www.semanticdesktop.org/ontologies/2007/01/19/nie#>
     
-    SELECT (MAX(?versionNumber) as ?maxVersionNumber) ?documentVersionId ?numberVR ?extension ?download ?agendaitemPrio ?agendaitem_id ?documentVersionName ?documentTitle  WHERE { 
-       GRAPH <${targetGraph}>
-       {
-         ?agenda a besluitvorming:Agenda ;
-                   mu:uuid "${agendaId}" ;
-                   ext:agendaNaam ?agendaName ;
-                   dct:hasPart ?agendaitem .
-         ?agendaitem mu:uuid ?agendaitem_id .
-         OPTIONAL { ?agendaitem ext:prioriteit ?agendaitemPrio . }
-         OPTIONAL { 
-					 ?agendaitem ext:bevatAgendapuntDocumentversie ?documentVersions .
-					 ?document  besluitvorming:heeftVersie ?documentVersions .
-					 ?documentVersions mu:uuid ?documentVersionId .
-                     ?documentVersions ext:versieNummer ?versionNumber .
-                     ?documentVersions ext:file ?file .
-                     ?download nie:dataSource ?file .
-					 ?file mu:uuid ?fileId .
-					 ?file dbpedia:fileExtension ?extension .
-                     OPTIONAL { ?document  besluitvorming:stuknummerVR ?numberVR . }
-                     OPTIONAL { ?document  dct:title ?documentTitle . }
-                     OPTIONAL { ?documentVersions ext:gekozenDocumentNaam ?documentVersionName }
-				 }
-        } 
+   SELECT (MAX(?versionNumber) as ?maxVersionNumber) ?documentVersionId ?numberVR ?extension ?download ?agendaitemPrio ?agendaitem_id ?documentVersionName ?documentTitle  WHERE { 
+       GRAPH <${targetGraph}> {
+            ?agenda a besluitvorming:Agenda ;
+                    mu:uuid "${agendaId}" ;
+                    ext:agendaNaam ?agendaName ;
+                    dct:hasPart ?agendaitem .
+            ?agendaitem mu:uuid ?agendaitem_id .
+            OPTIONAL { ?agendaitem ext:prioriteit ?agendaitemPrio . }
+            OPTIONAL {
+                ?agendaitem ext:bevatAgendapuntDocumentversie ?documentVersions .
+                ?document besluitvorming:heeftVersie ?documentVersions .
+                ?document besluitvorming:heeftVersie ?allVersions .
+                ?allVersions mu:uuid ?documentVersionId .
+                ?allVersions ext:versieNummer ?versionNumber .
+                ?allVersions ext:file ?file .
+                ?download nie:dataSource ?file .
+                ?file dbpedia:fileExtension ?extension .
+                OPTIONAL { ?document besluitvorming:stuknummerVR ?numberVR . }
+                OPTIONAL { ?document dct:title ?documentTitle . }
+                OPTIONAL { ?allVersions ext:gekozenDocumentNaam ?documentVersionName . }
+            }
+       } 
     } GROUP BY ?documentVersionId ?numberVR ?extension ?download ?agendaitemPrio ?agendaitem_id ?documentVersionName ?documentTitle`;
     const data = await query(queryString);
     return parseSparqlResults(data);
