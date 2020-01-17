@@ -1,6 +1,6 @@
-import { query } from 'mu';
+import { sparqlEscapeString, sparqlEscapeUri, query } from 'mu';
 
-const targetGraph = 'http://mu.semte.ch/graphs/organizations/kanselarij';
+const GRAPH = process.env.MU_APPLICATION_GRAPH || 'http://mu.semte.ch/application';
 
 const getAllAgendaItemsFromAgendaWithDocuments = async (agendaId) => {
   const queryString = `
@@ -12,23 +12,23 @@ const getAllAgendaItemsFromAgendaWithDocuments = async (agendaId) => {
   PREFIX nie: <http://www.semanticdesktop.org/ontologies/2007/01/19/nie#>
   PREFIX dossier: <https://data.vlaanderen.be/ns/dossier#>
 
- SELECT ?agendaitemId ?agendaitemPrio ?agendaName ?documentName ?extension ?download WHERE {
-     GRAPH <${targetGraph}> {
-          ?agenda a besluitvorming:Agenda ;
-                  mu:uuid "${agendaId}" ;
-                  ext:agendaNaam ?agendaName ;
-                  dct:hasPart ?agendaitem .
-          ?agendaitem mu:uuid ?agendaitemId .
-          OPTIONAL { ?agendaitem ext:prioriteit ?agendaitemPrio . }
-          OPTIONAL {
-              ?agendaitem ext:bevatAgendapuntDocumentversie ?document .
+  SELECT DISTINCT ?agendaitemId ?agendaitemPrio ?agendaName ?documentName ?extension ?download
+  FROM ${sparqlEscapeUri(GRAPH)}
+  WHERE {
+      ?agenda a besluitvorming:Agenda ;
+              mu:uuid ${sparqlEscapeString(agendaId)} ;
+              ext:agendaNaam ?agendaName ;
+              dct:hasPart ?agendaitem .
+      ?agendaitem mu:uuid ?agendaitemId .
+      OPTIONAL { ?agendaitem ext:prioriteit ?agendaitemPrio . }
+      OPTIONAL {
+          ?agendaitem ext:bevatAgendapuntDocumentversie ?document .
 
-              ?document dct:title ?documentName ;
-                  ext:file ?file .
-              ?file dbpedia:fileExtension ?extension .
-              ?download nie:dataSource ?file .
-          }
-     }
+          ?document dct:title ?documentName ;
+              ext:file ?file .
+          ?file dbpedia:fileExtension ?extension .
+          ?download nie:dataSource ?file .
+      }
   }`;
   const data = await query(queryString);
   return parseSparqlResults(data);
