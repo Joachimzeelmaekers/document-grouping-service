@@ -10,14 +10,14 @@ app.get('/getDocumentsFromAgenda/:agenda_id', async (req, res) => {
   if (!req.params || !req.params.agenda_id) {
     throw new Error(res, 'Agenda_id is missing.');
   }
-  const agenda_id = req.params.agenda_id;
+  const agendaId = req.params.agenda_id;
   try {
-    const allAgendaItemsWithDocuments = await getAllAgendaItemsFromAgendaWithDocuments(agenda_id);
+    const allAgendaItemsWithDocuments = await getAllAgendaItemsFromAgendaWithDocuments(agendaId);
     res.send({
       status: ok,
       data: {
-        files: allAgendaItemsWithDocuments.filter((item) => item.download),
-      },
+        files: allAgendaItemsWithDocuments.filter((item) => item.download)
+      }
     });
   } catch (e) {
     console.log('Something went wrong', e);
