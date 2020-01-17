@@ -2,7 +2,7 @@ import cors from 'cors';
 import { app, errorHandler } from 'mu';
 import { ok } from 'assert';
 
-const { getAllAgendaItemsFromAgendaWithDocuments } = require('./repository');
+import { getAllAgendaItemsFromAgendaWithDocuments } from './repository';
 
 app.use(cors());
 
