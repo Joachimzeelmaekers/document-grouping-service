@@ -16,7 +16,7 @@ app.get('/getDocumentsFromAgenda/:agenda_id', async (req, res) => {
     res.send({
       status: ok,
       data: {
-        files: allAgendaItemsWithDocuments.filter((item) => item.download)
+        files: allAgendaItemsWithDocuments
       }
     });
   } catch (e) {
