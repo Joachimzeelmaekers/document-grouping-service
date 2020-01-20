@@ -19,16 +19,14 @@ const getAllAgendaItemsFromAgendaWithDocuments = async (agendaId) => {
               mu:uuid ${sparqlEscapeString(agendaId)} ;
               ext:agendaNaam ?agendaName ;
               dct:hasPart ?agendaitem .
-      ?agendaitem mu:uuid ?agendaitemId .
-      OPTIONAL { ?agendaitem ext:prioriteit ?agendaitemPrio . }
-      OPTIONAL {
-          ?agendaitem ext:bevatAgendapuntDocumentversie ?document .
+      ?agendaitem mu:uuid ?agendaitemId ;
+          ext:prioriteit ?agendaitemPrio ;
+          ext:bevatAgendapuntDocumentversie ?document .
 
-          ?document dct:title ?documentName ;
-              ext:file ?file .
-          ?file dbpedia:fileExtension ?extension .
-          ?download nie:dataSource ?file .
-      }
+      ?document dct:title ?documentName ;
+          ext:file ?file .
+      ?file dbpedia:fileExtension ?extension .
+      ?download nie:dataSource ?file .
   }`;
   const data = await query(queryString);
   return parseSparqlResults(data);
