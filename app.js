@@ -1,6 +1,5 @@
 import cors from 'cors';
 import { app, errorHandler } from 'mu';
-import { ok } from 'assert';
 
 import { getAllAgendaItemsFromAgendaWithDocuments } from './repository';
 
@@ -13,12 +12,37 @@ app.get('/getDocumentsFromAgenda/:agenda_id', async (req, res) => {
   const agendaId = req.params.agenda_id;
   try {
     const allAgendaItemsWithDocuments = await getAllAgendaItemsFromAgendaWithDocuments(agendaId);
-    res.send({
-      status: ok,
-      data: {
-        files: allAgendaItemsWithDocuments
-      }
+    const response = {};
+    response.data = allAgendaItemsWithDocuments.map((attributes) => {
+      return {
+        type: 'files',
+        id: attributes.fileId,
+        attributes: {
+          uri: attributes.uri,
+          // name: attributes.fileName,
+          // format: attributes.format,
+          // size: attributes.size,
+          extension: attributes.extension,
+          // created: attributes.created,
+          // modified: attributes.modified
+        },
+        relationships: {
+          'document': {
+            data: { id: attributes.documentId, type: 'document-versions' }
+          }
+        }
+      };
     });
+    response.included = allAgendaItemsWithDocuments.map((attributes) => {
+      return {
+        type: 'document-versions',
+        id: attributes.documentId,
+        attributes: {
+          name: attributes.documentName
+        }
+      };
+    });
+    res.send(response);
   } catch (e) {
     console.log('Something went wrong', e);
     throw new Error('Something went wrong with querying the data from the database.');
