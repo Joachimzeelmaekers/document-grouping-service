@@ -5,7 +5,7 @@ import { getAllAgendaItemsFromAgendaWithDocuments } from './repository';
 
 app.use(cors());
 
-app.get('/getDocumentsFromAgenda/:agenda_id', async (req, res) => {
+app.get('/agendas/:agenda_id/agendaitems/files', async (req, res) => {
   if (!req.params || !req.params.agenda_id) {
     throw new Error(res, 'Agenda_id is missing.');
   }
