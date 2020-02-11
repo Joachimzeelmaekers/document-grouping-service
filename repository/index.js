@@ -9,11 +9,11 @@ const getAllAgendaItemsFromAgendaWithDocuments = async (agendaId) => {
   PREFIX besluitvorming: <http://data.vlaanderen.be/ns/besluitvorming#>
   PREFIX dct: <http://purl.org/dc/terms/>
   PREFIX dbpedia: <http://dbpedia.org/ontology/>
-  PREFIX nie: <http://www.semanticdesktop.org/ontologies/2007/01/19/nie#>
   PREFIX dossier: <https://data.vlaanderen.be/ns/dossier#>
   PREFIX nfo: <http://www.semanticdesktop.org/ontologies/2007/03/22/nfo#>
 
-  SELECT DISTINCT ?fileId (?physicalFile AS ?uri) ?format ?size ?extension ?created ?modified ?documentId ?documentName
+  SELECT DISTINCT ?document ?documentName ?documentId ?documentCreated ?documentModified ?documentConfidential
+      ?file ?fileId ?fileFormat ?fileSize ?fileExtension ?fileCreated ?fileModified
   FROM ${sparqlEscapeUri(GRAPH)}
   WHERE {
       ?agenda a besluitvorming:Agenda ;
@@ -27,13 +27,18 @@ const getAllAgendaItemsFromAgendaWithDocuments = async (agendaId) => {
       ?document dct:title ?documentName ;
           mu:uuid ?documentId ;
           ext:file ?file .
-      ?file ^nie:dataSource ?physicalFile .
-      ?physicalFile mu:uuid ?fileId .
-      OPTIONAL { ?physicalFile dct:format ?format . }
-      OPTIONAL { ?physicalFile nfo:fileSize ?size . }
-      OPTIONAL { ?physicalFile dbpedia:fileExtension ?extension . }
-      OPTIONAL { ?physicalFile dct:created ?created . }
-      OPTIONAL { ?physicalFile dct:modified ?modified . }
+      OPTIONAL { ?document dct:created ?documentCreated }
+      OPTIONAL { ?document dct:modified ?documentModified }
+      OPTIONAL { ?document ext:vertrouwelijk ?documentConfidential }
+
+      ?file a nfo:FileDataObject ;
+          mu:uuid ?fileId .
+      OPTIONAL { ?file nfo:fileName ?fileName . }
+      OPTIONAL { ?file dct:format ?fileFormat . }
+      OPTIONAL { ?file nfo:fileSize ?fileSize . }
+      OPTIONAL { ?file dbpedia:fileExtension ?fileExtension . }
+      OPTIONAL { ?file dct:created ?fileCreated . }
+      OPTIONAL { ?file dct:modified ?fileModified . }
   }`;
   const data = await query(queryString);
   return parseSparqlResults(data);
