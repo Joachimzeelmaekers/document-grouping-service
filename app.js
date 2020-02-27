@@ -24,7 +24,7 @@ app.get('/agendas/:agenda_id/agendaitems/documents', async (req, res) => {
         confidential: attributes.documentConfidential
       },
       relationships: {
-        'file': {
+        file: {
           data: { id: attributes.fileId, type: 'files' }
         }
       }
