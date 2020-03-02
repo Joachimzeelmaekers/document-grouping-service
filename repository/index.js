@@ -24,7 +24,8 @@ const getAllAgendaItemsFromAgendaWithDocuments = async (agendaId) => {
           ext:prioriteit ?agendaitemPrio ;
           ext:bevatAgendapuntDocumentversie ?document .
 
-      ?document dct:title ?documentName ;
+      ?document a dossier:Stuk ;
+          dct:title ?documentName ;
           mu:uuid ?documentId ;
           ext:file ?file .
       OPTIONAL { ?document dct:created ?documentCreated }
