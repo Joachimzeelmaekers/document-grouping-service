@@ -13,8 +13,6 @@
   "author": "",
   "license": "MIT",
   "dependencies": {
-    "cors": "^2.8.5",
-    "express": "^4.16.4"
   },
   "bugs": {
     "url": "https://github.com/kanselarij-vlaanderen/document-grouping-service/issues"
