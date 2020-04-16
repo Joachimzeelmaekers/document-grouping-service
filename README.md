@@ -1,3 +1,9 @@
+# DEPRECATED
+
+This repository has been replaced by:
+- https://github.com/kanselarij-vlaanderen/file-bundling-service
+- https://github.com/kanselarij-vlaanderen/file-bundling-job-creation-service
+
 
 ## Configuration snippets
 
